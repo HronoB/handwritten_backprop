@@ -205,14 +205,19 @@ class DrawingApp:
             activations = self._current_activations()
         output = list(activations[-1])
 
-        exps = np.exp(np.array(output) - np.max(output))
-        probs = exps / exps.sum()
 
-        best = int(np.argmax(probs))
+        vecLen = len(output)
+        softmax = [0]*vecLen
+
+        sm = sum(math.exp(i) for i in output)
+        for i in range(vecLen):
+            softmax[i] = math.exp(output[i])/sm
+
+        best = int(np.argmax(softmax))
         self.pred_label.config(text=f"Prediction: {best}")
 
         for i, (bar, lbl) in enumerate(zip(self.prob_bars, self.prob_labels)):
-            p = float(probs[i]) * 100
+            p = float(softmax[i]) * 100
             bar["value"] = p
             lbl.config(text=f"{p:.1f}%")
 
